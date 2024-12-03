@@ -17,7 +17,7 @@ const User = sequelize.define('User', {
     allowNull: false,
   },
   type: {
-    type: DataTypes.ENUM('student', 'teacher'),
+    type: DataTypes.ENUM('employee', 'hr'),
     allowNull: false,
   },
 });
@@ -32,23 +32,11 @@ const Outpass = sequelize.define('Outpass', {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  registernumber: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
   email: {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  year: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  department: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  semester: {
+  role: {
     type: DataTypes.STRING,
     allowNull: false,
   },

@@ -34,8 +34,8 @@ router.post('/login', async (req, res) => {
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (isMatch) {
-      const jwtToken = jwt.sign({ username }, "KIRUTHIKA", { expiresIn: '1h' });
-      res.status(200).json({ kiruthiToken: jwtToken, userType: user.type, validation: true });
+      const jwtToken = jwt.sign({ username }, "GOKUL", { expiresIn: '1h' });
+      res.status(200).json({ jwtToken: jwtToken, userType: user.type, validation: true });
     } else {
       res.status(401).json({ error: 'Password is incorrect' });
     }

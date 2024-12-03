@@ -12,21 +12,17 @@ const nodemailer = require('nodemailer');
 const router = express.Router();
 
 
-const generateDigitalSignature = (studentName) => {
-  const secretKey = 'KiruthikaR';
-  const signature = crypto.createHmac('sha256', secretKey).update(studentName).digest('hex');
-  return signature;
-};
+
 
 const transporter = nodemailer.createTransport({
   service: 'Gmail',
   auth: {
-    user:"annaioutpass@gmail.com",
-    pass: "jsse bkwx kbvw gwky",
+    user:"schoutpass@gmail.com",
+    pass: "eino hpcu oioo mkbz",
   },
 });
 
-const sendAcceptanceEmail = async (studentEmail, id, studentName, registerNo,department, year,semester,reason) => {
+const sendAcceptanceEmail = async (email, id, name, role,reason) => {
     const doc = new PDFDocument();
   
     try {
@@ -35,16 +31,12 @@ const sendAcceptanceEmail = async (studentEmail, id, studentName, registerNo,dep
       doc.font('./fonts/ARIBL0.ttf');
   
       const collegeLogoPath = './images/annailogo.jpg'; 
-      const backgroundImagePath = './images/building.png';
-      const backgroundImage = fs.readFileSync(backgroundImagePath);
   
       const logoImage = fs.readFileSync(collegeLogoPath);
       doc.image(logoImage, 50, 30, { width: 70, y:70 }); 
-      doc.image(backgroundImage, 40, 140, { width: 612-80, height: 792-180 ,opacity: 0.1});
       
       doc.moveUp(2)
-      doc.fontSize(20).text('ANNAI WOMENS COLLEGE', { align: 'center',bold: true, y: -30});
-      doc.fontSize(14).text('KARUR,Tamilnadu-636117 ', { align: 'center' });
+      doc.fontSize(20).text('Supply Chain Hub', { align: 'center',bold: true, y: -30});
       const lineStartX = 30; // Adjust the X-coordinate as needed
       const lineStartY = doc.y + 30; // Adjust the Y-coordinate to position the line below the text
       const lineEndX = doc.page.width - 30; // Adjust the X-coordinate for the line's end point
@@ -64,7 +56,7 @@ const sendAcceptanceEmail = async (studentEmail, id, studentName, registerNo,dep
       
   
   
-      const studentNameWidth = doc.widthOfString(`Student Name: ${studentName}`);
+      const studentNameWidth = doc.widthOfString(`Student Name: ${name}`);
       const studentNameX = (doc.page.width - studentNameWidth) / 2.1;
   
       const istTime = new Date();
@@ -73,38 +65,19 @@ const sendAcceptanceEmail = async (studentEmail, id, studentName, registerNo,dep
       // console.log(formattedIstTime)
       
       
-      doc.fontSize(20).text(`Student Name : ${studentName}`, studentNameX);
-      doc.fontSize(20).text(`Register No : ${registerNo}`);
-      doc.fontSize(20).text(`Department : ${department}`);
-      doc.fontSize(20).text(`Year : ${year}`);
-      doc.fontSize(20).text(`Semester : ${semester}`);
+      doc.fontSize(20).text(`Employee Name : ${name}`, studentNameX);
+      doc.fontSize(20).text(`Email : ${email}`);
+      doc.fontSize(20).text(`Role : ${role}`);
       doc.fontSize(20).text(`Reason: ${reason}`);
       doc.fontSize(20).text(`Date and Time of Acceptance: ${formattedIstTime}`);
       
       doc.moveDown(5);
   
-      // Load the checkmark image
-  const checkmarkImagePath = './images/tick.png'; // Replace with the actual path to your checkmark image
-  const checkmarkImage = fs.readFileSync(checkmarkImagePath);
   
-  // Calculate the X-coordinate for the checkmark image (centered above the text)
-  const centerX = doc.page.width / 2;
-  const checkmarkWidth = 40; // Adjust the width of the checkmark image
-  const checkmarkX = centerX - checkmarkWidth / 2;
-  
-  const yPosText = doc.page.height - 30; // Y-coordinate for the text
-  const yPosCheckmark = yPosText - 180; // Y-coordinate for the checkmark (adjust the value as needed)
-  
-  // Add the checkmark image above the text
-  doc.image(checkmarkImage, checkmarkX+20, yPosCheckmark, { width: checkmarkWidth });
-  doc.image(checkmarkImage, checkmarkX+140, yPosCheckmark, { width: checkmarkWidth });
-  
-  // Add the "Staff Sign" and "HOD Sign" text
-  doc.text('Staff Sign    HOD Sign', { align: 'center', width: doc.page.width - 170, y: yPosText, x: doc.page.width - 110 }); // Adjust the 'x' value as needed
-  
+ 
   
     
-      const watermarkText = 'ANNAI OUTPASS';
+      const watermarkText = 'SCH OUTPASS';
   
       const watermarkWidth = doc.widthOfString(watermarkText);
       const watermarkHeight = doc.currentLineHeight();
@@ -118,22 +91,8 @@ const sendAcceptanceEmail = async (studentEmail, id, studentName, registerNo,dep
          .fillOpacity(0.2)
          .text(watermarkText, watermarkX, watermarkY, { align: 'center'});
   
-      const signature = generateDigitalSignature(studentName);
   
-    doc.fontSize(12).text(`Digital Signature: ${signature}`,{ align: 'center' });
-  
-    
-    // Determine the available width for both labels
-    
-  // Add these lines after all other content is added
-  
-    // Calculate the X-coordinates for both labels to center them
-    
-    // Set the Y-coordinate for both labels
-    
-      //    const pdfPath = './outpass_acceptance.pdf'; // Define the file path where you want to save the PDF
-      // doc.pipe(fs.createWriteStream(pdfPath)); 
-      doc.end();
+   doc.end();
   
   
       const pdfBuffer = await new Promise((resolve, reject) => {
@@ -144,23 +103,23 @@ const sendAcceptanceEmail = async (studentEmail, id, studentName, registerNo,dep
       });
   
   
-      const mailOptions = {
-        from: 'vasavioutpass@gmail.com',
-        to: studentEmail,
-        subject: 'Outpass Accepted',
-        text: `Your outpass with ID ${id} has been accepted.`,
-        attachments: [
-          {
-            filename: 'outpass_acceptance.pdf',
-            content: pdfBuffer, 
-            contentType: 'application/pdf',
-          },
-        ],
-      };
+      // const mailOptions = {
+      //   from: 'schoutpass@gmail.com',
+      //   to: email,
+      //   subject: 'Outpass Accepted',
+      //   text: `Your outpass with ID ${id} has been accepted.`,
+      //   attachments: [
+      //     {
+      //       filename: 'outpass_acceptance.pdf',
+      //       content: pdfBuffer, 
+      //       contentType: 'application/pdf',
+      //     },
+      //   ],
+      // };
   
   
-      const sendMailAsync = util.promisify(transporter.sendMail.bind(transporter));
-      await sendMailAsync(mailOptions);
+      // const sendMailAsync = util.promisify(transporter.sendMail.bind(transporter));
+      // await sendMailAsync(mailOptions);
   
   
       console.log('Email sent successfully.');
@@ -170,7 +129,7 @@ const sendAcceptanceEmail = async (studentEmail, id, studentName, registerNo,dep
   };
 
 router.post('/outpass', async (req, res) => {
-  const { name, registernumber, email, year, department, semester, reason } = req.body;
+  const { name, email, role, reason, } = req.body;
 
   try {
     const currentUtcTime = new Date();
@@ -181,11 +140,8 @@ router.post('/outpass', async (req, res) => {
     const newOutpass = await Outpass.create({
       id: outpassId,
       name,
-      registernumber,
       email,
-      year,
-      department,
-      semester,
+      role,
       reason,
       current_datetime: formattedIstTime,
       status: 'pending'
@@ -193,7 +149,8 @@ router.post('/outpass', async (req, res) => {
 
     res.status(201).json({ submission: true, outpass: newOutpass });
   } catch (err) {
-    res.status(500).json({ error: 'Internal Server Error' });
+    console.log('Error:', err);
+    res.status(500).json({ error: err });
   }
 });
 
@@ -206,11 +163,11 @@ router.get('/history', async (req, res) => {
   }
 });
 
-router.get('/history/:registerNo', async (req, res) => {
-  const { registerNo } = req.params;
+router.get('/history/:name', async (req, res) => {
+  const { name } = req.params;
 
   try {
-    const outpasses = await Outpass.findAll({ where: { registernumber: registerNo } });
+    const outpasses = await Outpass.findAll({ where: { name: name } });
     res.json(outpasses);
   } catch (err) {
     res.status(500).json({ error: 'Internal Server Error' });
@@ -236,23 +193,20 @@ router.post('/outpass/:id/accept', async (req, res) => {
 
   try {
     const [updated] = await Outpass.update(
-      { status: 'HOD Accepted' },
+      { status: 'Accepted' },
       { where: { id } }
     );
 
     if (updated) {
       const outpass = await Outpass.findByPk(id);
       if (outpass) {
-        await sendAcceptanceEmail(
-          outpass.email,
-          id,
-          outpass.name,
-          outpass.registernumber,
-          outpass.department,
-          outpass.year,
-          outpass.semester,
-          outpass.reason
-        );
+        // await sendAcceptanceEmail(
+        //   outpass.email,
+        //   id,
+        //   outpass.name,
+        //   outpass.role,
+        //   outpass.reason
+        // );
         res.json({ success: true, email: outpass.email });
       } else {
         res.status(404).json({ success: false, message: 'Outpass not found' });
@@ -266,37 +220,5 @@ router.post('/outpass/:id/accept', async (req, res) => {
   }
 });
 
-
-router.post('/outpass/:id/staff-approve', async (req, res) => {
-  const { id } = req.params;
-
-  try {
-    const [updated] = await Outpass.update({ status: 'Staff Approved' }, { where: { id } });
-
-    if (updated) {
-      res.json({ success: true });
-    } else {
-      res.status(404).json({ success: false, message: 'Outpass not found' });
-    }
-  } catch (err) {
-    res.status(500).json({ success: false, message: 'Internal Server Error' });
-  }
-});
-
-router.post('/outpass/:id/staff-decline', async (req, res) => {
-  const { id } = req.params;
-
-  try {
-    const [updated] = await Outpass.update({ status: 'Staff Declined' }, { where: { id } });
-
-    if (updated) {
-      res.json({ success: true });
-    } else {
-      res.status(404).json({ success: false, message: 'Outpass not found' });
-    }
-  } catch (err) {
-    res.status(500).json({ success: false, message: 'Internal Server Error' });
-  }
-});
 
 module.exports = router;
