@@ -30,10 +30,10 @@ const sendAcceptanceEmail = async (email, id, name, role,reason) => {
       doc.font('./fonts/arial.ttf');
       doc.font('./fonts/ARIBL0.ttf');
   
-      const collegeLogoPath = './images/annailogo.jpg'; 
+      // const collegeLogoPath = './images/annailogo.jpg'; 
   
-      const logoImage = fs.readFileSync(collegeLogoPath);
-      doc.image(logoImage, 50, 30, { width: 70, y:70 }); 
+      // const logoImage = fs.readFileSync(collegeLogoPath);
+      // doc.image(logoImage, 50, 30, { width: 70, y:70 }); 
       
       doc.moveUp(2)
       doc.fontSize(20).text('Supply Chain Hub', { align: 'center',bold: true, y: -30});
@@ -103,23 +103,23 @@ const sendAcceptanceEmail = async (email, id, name, role,reason) => {
       });
   
   
-      // const mailOptions = {
-      //   from: 'schoutpass@gmail.com',
-      //   to: email,
-      //   subject: 'Outpass Accepted',
-      //   text: `Your outpass with ID ${id} has been accepted.`,
-      //   attachments: [
-      //     {
-      //       filename: 'outpass_acceptance.pdf',
-      //       content: pdfBuffer, 
-      //       contentType: 'application/pdf',
-      //     },
-      //   ],
-      // };
+      const mailOptions = {
+        from: 'schoutpass@gmail.com',
+        to: email,
+        subject: 'Outpass Accepted',
+        text: `Your outpass with ID ${id} has been accepted.`,
+        attachments: [
+          {
+            filename: 'outpass_acceptance.pdf',
+            content: pdfBuffer, 
+            contentType: 'application/pdf',
+          },
+        ],
+      };
   
   
-      // const sendMailAsync = util.promisify(transporter.sendMail.bind(transporter));
-      // await sendMailAsync(mailOptions);
+      const sendMailAsync = util.promisify(transporter.sendMail.bind(transporter));
+      await sendMailAsync(mailOptions);
   
   
       console.log('Email sent successfully.');
@@ -200,13 +200,13 @@ router.post('/outpass/:id/accept', async (req, res) => {
     if (updated) {
       const outpass = await Outpass.findByPk(id);
       if (outpass) {
-        // await sendAcceptanceEmail(
-        //   outpass.email,
-        //   id,
-        //   outpass.name,
-        //   outpass.role,
-        //   outpass.reason
-        // );
+        await sendAcceptanceEmail(
+          outpass.email,
+          id,
+          outpass.name,
+          outpass.role,
+          outpass.reason
+        );
         res.json({ success: true, email: outpass.email });
       } else {
         res.status(404).json({ success: false, message: 'Outpass not found' });
@@ -215,6 +215,32 @@ router.post('/outpass/:id/accept', async (req, res) => {
       res.status(404).json({ success: false, message: 'Outpass not found' });
     }
   } catch (err) {
+    console.log('Error:', err);
+    res.status(500).json({ success: false, message: 'Internal Server Error' });
+  }
+});
+
+router.post('/outpass/:id/decline', async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const [updated] = await Outpass.update(
+      { status: 'Rejected' },
+      { where: { id } }
+    );
+
+    if (updated) {
+      const outpass = await Outpass.findByPk(id);
+      if (outpass) {
+        res.json({ success: true, email: outpass.email });
+      } else {
+        res.status(404).json({ success: false, message: 'Outpass not found' });
+      }
+    } else {
+      res.status(404).json({ success: false, message: 'Outpass not found' });
+    }
+  } catch (err) {
+    
     console.log('Error:', err);
     res.status(500).json({ success: false, message: 'Internal Server Error' });
   }

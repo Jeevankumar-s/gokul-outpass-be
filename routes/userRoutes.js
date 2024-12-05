@@ -19,6 +19,7 @@ router.post('/register', async (req, res) => {
 
     res.status(201).json({ id: newUser.id, username: newUser.username, type: newUser.type });
   } catch (err) {
+    console.log('Error:', err);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
